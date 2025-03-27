@@ -26,7 +26,7 @@ The **Emoji Detector** is a deep learning project aimed at accurately identifyin
 ## Installation
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/your-repo/emoji-detector.git
+git clone https://github.com/muteeurrehman28/emoji-detector-ai.git
 cd emoji-detector
 pip install -r requirements.txt
 ```
@@ -107,9 +107,6 @@ gunicorn -w 4 -b 0.0.0.0:8000 main:app
 
 ## License
 This project is licensed under the **MIT License**.
-
-## Contact
-For queries, raise an issue on GitHub or contact **[your-email@example.com](mailto:your-email@example.com)**.
 
 ## Acknowledgments
 Special thanks to:
