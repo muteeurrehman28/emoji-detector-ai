@@ -5,9 +5,10 @@ import pyperclip
 import webbrowser
 
 # Define paths
-txt_file_path = r"D:\University Work\Semester IV\Software Engineering\Emoji Detector\emoji-detector-ai\emojis_unicode.txt"
+txt_file_path = r"D:\University Work\Semester IV\Software Engineering\emoji-detector-ai\data\emojis_unicode.txt"
 screenshot_path = r"D:\University Work\Semester IV\Software Engineering\Emoji Detector\emoji-detector-ai\screenshots"
 label_file = os.path.join(screenshot_path, 'labels.txt')
+
 # Create folder if it doesn't exist
 if not os.path.exists(screenshot_path):
     os.makedirs(screenshot_path)
@@ -42,9 +43,12 @@ with open(label_file, 'w', encoding='utf-8') as f:
         pyautogui.press("enter")
         time.sleep(2)  # Wait for the message to send
 
-        # Take screenshot
+        # Take screenshot of the message area (around Point(1377, 705))
         screenshot_file = os.path.join(screenshot_path, f'screenshot_{idx}.png')
-        pyautogui.screenshot(screenshot_file)
+
+        # Define the region for cropping (adjust width and height accordingly)
+        x, y, width, height = 1398, 702, 130, 85  # Adjust these values if needed
+        pyautogui.screenshot(screenshot_file, region=(x, y, width, height))
 
         # Save label as "screenshot_name, emoji, unicode"
         f.write(f'{os.path.basename(screenshot_file)}, {emoji}, {unicode_value}\n')
