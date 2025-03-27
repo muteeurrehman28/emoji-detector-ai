@@ -8,7 +8,6 @@ import webbrowser
 txt_file_path = r"D:\University Work\Semester IV\Software Engineering\Emoji Detector\emoji-detector-ai\emojis_unicode.txt"
 screenshot_path = r"D:\University Work\Semester IV\Software Engineering\Emoji Detector\emoji-detector-ai\screenshots"
 label_file = os.path.join(screenshot_path, 'labels.txt')
-
 # Create folder if it doesn't exist
 if not os.path.exists(screenshot_path):
     os.makedirs(screenshot_path)
