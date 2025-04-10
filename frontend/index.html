@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Emoji Detector</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h3 class="mb-3 text-primary">🔍 Emoji Detector</h3>
+
+            <!-- File Drop Area -->
+            <div class="drop-zone" id="dropZone">📁 Drag & Drop Images Here</div>
+
+            <!-- File Upload -->
+            <input type="file" id="fileInput" accept="image/*" multiple hidden>
+
+            <!-- Image Preview Grid -->
+            <div class="image-grid" id="imageGrid"></div>
+
+            <!-- Processing Spinner -->
+            <div class="spinner mt-3">Analyzing...</div>
+
+            <!-- Detect Button -->
+            <button class="btn btn-primary w-100 mt-3" onclick="uploadImages()">Detect Emojis</button>
+
+            <!-- Output -->
+            <div class="output mt-3" id="output"></div>
+
+            <!-- Download JSON Button -->
+            <button class="btn btn-success w-100 mt-3 btn-download" id="downloadJson" onclick="downloadJson()">📥 Download JSON</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+</body>
+</html>
