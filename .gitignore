@@ -1,1 +1,10 @@
-screenshots/
+emoji_data/processed/
+emoji_data/test_images/
+assets/whatsapp_synthetic
+emoji_data/augmented_classified_emojis
+emoji_data/test_images
+emoji_data/green-bg-classified-emojis
+emoji_data/cropped_emojis
+emoji_data/classified_emojis
+emoji_data/bg-removed
+yolov5

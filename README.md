@@ -99,7 +99,7 @@ gunicorn -w 4 -b 0.0.0.0:8000 main:app
 - **Milestone 3:** Integration with frontend for image uploads.
 - **Milestone 4:** Support for animated emojis and GIFs.
 
-## Contribution Guidelines
+## Contribution Guidelines 
 1. Fork the repository.
 2. Create a feature branch (`git checkout -b feature-xyz`).
 3. Commit changes (`git commit -m "Added new feature"`).
