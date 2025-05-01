@@ -1,45 +1,114 @@
 import tensorflow as tf
-import numpy as np
-import json
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import os
-import cv2
+import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix
+from tabulate import tabulate
+import json
+import random
 
-# Paths
-categorized_dataset_dir = r"D:\University Work\Semester IV\Software Engineering\emoji-detector-ai\screenshots\categorized_images"
-model_path = r"D:\University Work\Semester IV\Software Engineering\emoji-detector-ai\models\emoji_model_epoch_100.h5"
-class_labels_path = os.path.join(categorized_dataset_dir, "class_labels.json")
-test_images_dir = r"D:\University Work\Semester IV\Software Engineering\emoji-detector-ai\screenshots\test_images"
+# 🏷 Set paths
+model_path = r"D:/University Work/Backup/emoji-detector-ai/models/mobilenetv2_finetuned.h5"  # Updated model path
+class_labels_path = r'D:/University Work/Backup/emoji-detector-ai/models/class_labels.json'  # Update this path if needed
+dataset_dir = r"D:\University Work\Backup\emoji-detector-ai\emoji_data\classified_emojis"  # Path to the classified_emojis directory
 
-# Load the trained model
-model = tf.keras.models.load_model(model_path)
-
-# Load class labels
-with open(class_labels_path, "r") as f:
+# 📊 Load class labels
+with open(class_labels_path, 'r', encoding='utf-8') as f:
     class_labels = json.load(f)
-class_labels = {v: k for k, v in class_labels.items()}  # Reverse mapping
+class_names = list(class_labels.keys())
+index_to_class = {v: k for k, v in class_labels.items()}
+print(f"Loaded {len(class_names)} classes: {class_names}")
 
-# Get all image files in the test images directory
-image_files = [f for f in os.listdir(test_images_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+# 🧠 Load the trained model
+print(f"Loading model from: {model_path}")
+model = load_model(model_path)
 
-# Image preprocessing function
-def preprocess_image(image_path):
-    img = cv2.imread(image_path)  # Load the image
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB (if necessary)
-    img = cv2.resize(img, (128, 128))  # Resize to match model input size
-    img = img.astype("float32") / 255.0  # Normalize pixel values to [0, 1]
-    img = np.expand_dims(img, axis=0)  # Add batch dimension
-    return img
+# 📂 Collect all image paths from the classified_emojis directory
+image_paths = []
+true_labels = []
+for category in os.listdir(dataset_dir):
+    category_path = os.path.join(dataset_dir, category)
+    if not os.path.isdir(category_path):
+        continue
+    for img_name in os.listdir(category_path):
+        if img_name.endswith('.png') or img_name.endswith('.jpg'):  # Include both .png and .jpg formats
+            img_path = os.path.join(category_path, img_name)
+            image_paths.append(img_path)
+            true_labels.append(category)
 
-# Iterate over all test images and make predictions
-for image_file in image_files:
-    image_path = os.path.join(test_images_dir, image_file)
+# 🧩 Debugging step: Check the number of images collected
+print(f"Total images found: {len(image_paths)}")
+if len(image_paths) == 0:
+    print("No images found. Please check the dataset path or format of images.")
+else:
+    # 📌 Randomly select 100 images for prediction
+    num_images_to_predict = 1000  # Adjust as needed
+    if len(image_paths) < num_images_to_predict:
+        num_images_to_predict = len(image_paths)
+        print(f"Dataset has only {num_images_to_predict} images. Predicting on all available images.")
+    else:
+        print(f"Selecting {num_images_to_predict} random images for prediction...")
 
-    # Preprocess the image
-    img_array = preprocess_image(image_path)
+    random_indices = random.sample(range(len(image_paths)), num_images_to_predict)
+    selected_image_paths = [image_paths[i] for i in random_indices]
+    selected_true_labels = [true_labels[i] for i in random_indices]
 
-    # Make prediction
-    predictions = model.predict(img_array)
-    predicted_class = np.argmax(predictions)  # Get the class index
-    predicted_label = class_labels[predicted_class]  # Get class label
+    # 📈 Predict categories and track results
+    print("\nPredictions:\n")
+    table_data = []
+    correct_predictions = 0
+    predicted_labels = []
+    for img_path, true_label in zip(selected_image_paths, selected_true_labels):
+        # Load and preprocess the image
+        img = load_img(img_path, target_size=(128, 128))
+        img_array = img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
 
-    print(f"✅ {image_file} -> Predicted Emoji: {predicted_label}")
+        # Predict
+        predictions = model.predict(img_array, verbose=0)
+        predicted_class_idx = np.argmax(predictions, axis=1)[0]
+        predicted_class = index_to_class[predicted_class_idx]
+        confidence = predictions[0][predicted_class_idx] * 100
+
+        # Track results
+        img_name = os.path.basename(img_path)
+        predicted_labels.append(predicted_class)
+        if predicted_class == true_label:
+            correct_predictions += 1
+        table_data.append([img_name, true_label, predicted_class, f"{confidence:.2f}%"])
+
+    # Print predictions in a table
+    headers = ["Image", "True Category", "Predicted Category", "Confidence"]
+    print(tabulate(table_data, headers=headers, tablefmt="grid"))
+
+    # 📊 Calculate and display metrics
+    accuracy = (correct_predictions / num_images_to_predict) * 100
+
+    print("\n📊 Evaluation Metrics:")
+    print(f"Total Images Tested: {num_images_to_predict}")
+    print(f"Correct Predictions: {correct_predictions}")
+    print(f"Accuracy: {accuracy:.2f}%")
+
+    # Classification Report with all class names
+    print("\nClassification Report:")
+    # Ensure all class names are included, even if not present in the sample
+    report = classification_report(
+        selected_true_labels,
+        predicted_labels,
+        labels=class_names,  # Specify all class names
+        target_names=class_names,
+        zero_division=0  # Avoid division by zero for classes with no predictions
+    )
+    print(report)
+
+    # Confusion Matrix with all class names
+    print("\nConfusion Matrix:")
+    cm = confusion_matrix(
+        selected_true_labels,
+        predicted_labels,
+        labels=class_names  # Specify all class names
+    )
+    cm_table = [[class_names[i]] + list(cm[i]) for i in range(len(class_names))]
+    headers_cm = [""] + class_names
+    print(tabulate(cm_table, headers=headers_cm, tablefmt="grid"))
