@@ -3,56 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoji Detector AI</title>
+    <title>Emoji Detector AI | Advanced Vision System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/marked@4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
                     colors: {
-                        primary: '#5D5CDE',
-                        'primary-dark': '#4A49B5',
-                        'primary-light': '#7A79E9',
+                        primary: {
+                            50: '#f0f0ff',
+                            100: '#e0e0ff',
+                            200: '#c2c1ff',
+                            300: '#a3a2ff',
+                            400: '#8584ff',
+                            500: '#5D5CDE',
+                            600: '#4b4ab2',
+                            700: '#3a3987',
+                            800: '#29295b',
+                            900: '#17172e',
+                        },
+                        secondary: {
+                            50: '#f5f7fa',
+                            100: '#ebeef5',
+                            200: '#d8dde7',
+                            300: '#c4cbd9',
+                            400: '#b1bacc',
+                            500: '#9da9be',
+                            600: '#8a97ac',
+                            700: '#76849a',
+                            800: '#637288',
+                            900: '#505b6e',
+                        },
+                        success: {
+                            50: '#ecfdf5',
+                            500: '#10b981',
+                            700: '#047857',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            700: '#b45309',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            700: '#b91c1c',
+                        },
                         dark: {
-                            bg: '#181818',
-                            card: '#242424',
-                            border: '#333333'
+                            bg: '#111827',
+                            card: '#1f2937',
+                            sidebar: '#0f172a',
+                            border: '#374151'
                         },
                         light: {
-                            bg: '#FFFFFF',
-                            card: '#F5F5F7',
-                            border: '#E5E5E5'
+                            bg: '#f9fafb',
+                            card: '#ffffff',
+                            sidebar: '#f3f4f6',
+                            border: '#e5e7eb'
                         }
                     },
+                    boxShadow: {
+                        'glow': '0 0 15px rgba(93, 92, 222, 0.5)',
+                        'glow-sm': '0 0 5px rgba(93, 92, 222, 0.3)',
+                    },
+                    keyframes: {
+                        shimmer: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.5 },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: 0 },
+                            '100%': { transform: 'translateY(0)', opacity: 1 },
+                        },
+                        pulse: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.5 },
+                        },
+                        breathe: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' },
+                        },
+                        'bounce-gentle': {
+                            '0%, 100%': { transform: 'translateY(-2px)' },
+                            '50%': { transform: 'translateY(2px)' },
+                        },
+                    },
                     animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'bounce-slow': 'bounce 2s infinite'
+                        shimmer: 'shimmer 1.5s infinite ease-in-out',
+                        fadeIn: 'fadeIn 0.5s ease-out',
+                        slideUp: 'slideUp 0.5s ease-out',
+                        pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        breathe: 'breathe 3s ease-in-out infinite',
+                        'bounce-gentle': 'bounce-gentle 2s ease-in-out infinite',
+                    },
+                    transitionProperty: {
+                        'height': 'height',
+                        'spacing': 'margin, padding',
                     }
                 }
-            }
+            },
+            plugins: [
+                function ({ addVariant }) {
+                    addVariant('child', '& > *');
+                    addVariant('child-hover', '& > *:hover');
+                }
+            ],
         };
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
         }
-        .float {
+        .float-animation {
             animation: float 3s ease-in-out infinite;
         }
         .emoji-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 12px;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #5D5CDE, #A3A2FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-gradient {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-gradient::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #5D5CDE, #A3A2FF);
+        }
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
         }
         .dark .dark\:prose-dark {
-            color: #E5E5E5;
+            color: #E5E7EB;
         }
         .dark .dark\:prose-dark a {
-            color: #7A79E9;
+            color: #A3A2FF;
         }
         .dark .dark\:prose-dark strong {
             color: #FFFFFF;
@@ -61,6 +188,80 @@
         .dark .dark\:prose-dark h2, 
         .dark .dark\:prose-dark h3 {
             color: #FFFFFF;
+        }
+        .drag-hint {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .drag-active .drag-hint {
+            opacity: 1;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(93, 92, 222, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(93, 92, 222, 0.7);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        /* Emoji spotlight animation */
+        @keyframes spotlight {
+            0% { box-shadow: 0 0 0 rgba(93, 92, 222, 0); transform: scale(1); }
+            50% { box-shadow: 0 0 25px rgba(93, 92, 222, 0.7); transform: scale(1.05); }
+            100% { box-shadow: 0 0 0 rgba(93, 92, 222, 0); transform: scale(1); }
+        }
+        .emoji-spotlight {
+            animation: spotlight 3s ease-in-out;
+        }
+        /* Progress bar animation */
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        .progress-animation {
+            animation: progress 2s linear forwards;
+        }
+        /* Tutorial tooltip */
+        .tooltip {
+            position: relative;
+        }
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1f2937;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            z-index: 20;
+        }
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        .dark .tooltip::after {
+            background-color: #4b5563;
         }
     </style>
 </head>
@@ -79,188 +280,826 @@
         });
     </script>
 
-    <!-- Header -->
-    <header class="border-b border-light-border dark:border-dark-border">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <div class="text-3xl float">🔍</div>
-                <h1 class="text-2xl font-bold text-primary">Emoji Detector AI</h1>
+    <!-- Main App Layout -->
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="bg-light-sidebar dark:bg-dark-sidebar w-full lg:w-64 lg:fixed lg:h-full border-r border-light-border dark:border-dark-border px-4 py-6 overflow-y-auto transition-all duration-300 z-10">
+            <!-- Logo and App Title -->
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="relative">
+                    <div class="text-4xl float-animation">🔍</div>
+                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-primary-500 rounded-full"></div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">
+                        <span class="gradient-text">Emoji Detector</span>
+                        <span class="text-sm font-normal bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-2 py-0.5 rounded-full ml-1">AI</span>
+                    </h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Computer Vision System v2.5</p>
+                </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    <svg id="dark-icon" class="w-6 h-6 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
-                    </svg>
-                    <svg id="light-icon" class="w-6 h-6 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                    </svg>
-                </button>
-                <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="hover:text-primary transition-colors">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-                    </svg>
-                </a>
-            </div>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Left Column: Upload and Input -->
-            <div class="flex flex-col space-y-6">
-                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
-                    <h2 class="text-xl font-semibold mb-4">Upload Image</h2>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">Upload an image containing text with emojis for detection</p>
-                    
-                    <div id="upload-area" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary dark:hover:border-primary-light transition-colors">
-                        <div class="flex flex-col items-center justify-center">
-                            <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            <!-- Navigation Menu -->
+            <nav class="mb-8">
+                <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Main Menu</div>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 font-medium">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <p class="text-gray-600 dark:text-gray-400 mb-2">Drag & drop image or</p>
-                            <button id="browse-button" class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-medium">
-                                Browse Files
-                            </button>
-                            <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">Supported formats: JPG, PNG, GIF</p>
-                            <input type="file" id="file-input" class="hidden" accept="image/*">
+                            <span>Emoji Detection</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span>Analytics</span>
+                            <span class="ml-auto text-xs bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-1.5 py-0.5 rounded-full">New</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                            <span>Training</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Project Info -->
+            <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Project</div>
+            <div class="bg-light-card dark:bg-dark-card rounded-lg p-4 border border-light-border dark:border-dark-border mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-semibold">Model Status</h3>
+                    <span class="flex items-center px-2 py-1 rounded-full text-xs bg-success-50 text-success-700 dark:bg-success-700/20 dark:text-success-500">
+                        <span class="w-2 h-2 rounded-full bg-success-500 mr-1.5 animate-pulse"></span>
+                        Active
+                    </span>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Accuracy</span>
+                            <span class="font-medium">99.8%</span>
+                        </div>
+                        <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-primary-500 rounded-full" style="width: 99.8%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Processing Speed</span>
+                            <span class="font-medium">5ms/img</span>
+                        </div>
+                        <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div class="h-full bg-secondary-500 rounded-full" style="width: 92%"></div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Quick Actions</div>
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <button class="flex flex-col items-center justify-center p-3 bg-light-card dark:bg-dark-card rounded-lg border border-light-border dark:border-dark-border hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span class="text-xs">Export</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-3 bg-light-card dark:bg-dark-card rounded-lg border border-light-border dark:border-dark-border hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    <span class="text-xs">Share</span>
+                </button>
+            </div>
+
+            <!-- Theme Toggle and User Info -->
+            <div class="mt-auto">
+                <div class="flex items-center justify-between p-3 bg-light-card dark:bg-dark-card rounded-lg border border-light-border dark:border-dark-border mb-4">
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <svg id="dark-icon" class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg id="light-icon" class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                    <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                        </svg>
+                    </a>
+                    <a href="#" class="flex items-center bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white p-2 rounded-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span class="ml-1 text-xs">API</span>
+                    </a>
+                </div>
                 
-                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
-                    <h2 class="text-xl font-semibold mb-4">Process Options</h2>
-                    <div class="space-y-4">
+                <!-- Version -->
+                <div class="text-xs text-center text-gray-500 dark:text-gray-400">
+                    <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="hover:text-primary-500 transition-colors">Emoji Detector AI</a> • v2.5.3
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-64 transition-all duration-300">
+            <!-- Header Bar -->
+            <header class="sticky top-0 z-10 bg-light-bg/80 dark:bg-dark-bg/80 backdrop-blur-sm border-b border-light-border dark:border-dark-border">
+                <div class="px-4 sm:px-6 lg:px-8 py-4">
+                    <div class="flex items-center justify-between">
                         <div>
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" id="extract-text" class="rounded text-primary focus:ring-primary" checked>
-                                <span>Extract Text</span>
-                            </label>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 ml-6 mt-1">Extract message text from image</p>
+                            <h1 class="text-2xl font-bold">Emoji Detection Engine</h1>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">AI-powered emoji recognition in chat messages</p>
                         </div>
-                        <div>
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" id="detect-emojis" class="rounded text-primary focus:ring-primary" checked>
-                                <span>Detect Emojis</span>
-                            </label>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 ml-6 mt-1">Identify emojis in the message</p>
-                        </div>
-                        <div>
-                            <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" id="extract-timestamp" class="rounded text-primary focus:ring-primary" checked>
-                                <span>Extract Timestamp</span>
-                            </label>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 ml-6 mt-1">Detect message timestamp if available</p>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button id="process-button" class="w-full py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                            Process Image
+                        
+                        <!-- Mobile Menu Button -->
+                        <button id="mobile-menu-button" class="lg:hidden p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
                         </button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Right Column: Results and Preview -->
-            <div class="flex flex-col space-y-6">
-                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
-                    <h2 class="text-xl font-semibold mb-4">Image Preview</h2>
-                    <div id="preview-container" class="h-64 flex items-center justify-center border border-light-border dark:border-dark-border rounded-lg bg-gray-100 dark:bg-gray-800">
-                        <p id="no-preview" class="text-gray-500 dark:text-gray-400">No image selected</p>
-                        <img id="image-preview" class="hidden max-h-full max-w-full object-contain" src="" alt="Preview">
+            </header>
+
+            <!-- Page Content -->
+            <div class="p-4 sm:p-6 lg:p-8">
+                <!-- Dashboard Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-light-card dark:bg-dark-card rounded-lg p-5 border border-light-border dark:border-dark-border hover-scale shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Detection Accuracy</p>
+                                <p class="text-2xl font-semibold mt-1">99.8%</p>
+                            </div>
+                            <div class="h-12 w-12 bg-primary-100 dark:bg-primary-900 text-primary-500 rounded-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <span class="text-success-700 dark:text-success-500 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                                0.2% higher than baseline
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light-card dark:bg-dark-card rounded-lg p-5 border border-light-border dark:border-dark-border hover-scale shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Processing Time</p>
+                                <p class="text-2xl font-semibold mt-1">5ms</p>
+                            </div>
+                            <div class="h-12 w-12 bg-primary-100 dark:bg-primary-900 text-primary-500 rounded-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <span class="text-success-700 dark:text-success-500 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                                12% faster than v2.4
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light-card dark:bg-dark-card rounded-lg p-5 border border-light-border dark:border-dark-border hover-scale shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Emojis Supported</p>
+                                <p class="text-2xl font-semibold mt-1">4,832</p>
+                            </div>
+                            <div class="h-12 w-12 bg-primary-100 dark:bg-primary-900 text-primary-500 rounded-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <span class="text-success-700 dark:text-success-500 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                                +420 new emojis
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light-card dark:bg-dark-card rounded-lg p-5 border border-light-border dark:border-dark-border hover-scale shadow-sm hover:shadow-md transition-all">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">API Calls Today</p>
+                                <p class="text-2xl font-semibold mt-1">23,491</p>
+                            </div>
+                            <div class="h-12 w-12 bg-primary-100 dark:bg-primary-900 text-primary-500 rounded-lg flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <span class="text-success-700 dark:text-success-500 font-medium flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                                +18% from yesterday
+                            </span>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold">Detection Results</h2>
-                        <div id="status-badge" class="hidden px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                            Waiting
+
+                <!-- Activity Chart -->
+                <div class="bg-light-card dark:bg-dark-card rounded-lg shadow-sm border border-light-border dark:border-dark-border p-5 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-semibold">Processing Activity</h2>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-sm bg-primary-500 text-white rounded-md">Daily</button>
+                            <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md transition-colors">Weekly</button>
+                            <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md transition-colors">Monthly</button>
                         </div>
                     </div>
-                    
-                    <div id="results-placeholder" class="flex flex-col items-center justify-center py-10 text-center">
-                        <div class="text-4xl mb-4">🔍</div>
-                        <p class="text-gray-500 dark:text-gray-400">Upload and process an image to see detection results</p>
+                    <div>
+                        <canvas id="activityChart" height="100"></canvas>
                     </div>
-                    
-                    <div id="results-container" class="hidden space-y-4">
-                        <!-- Text Result -->
-                        <div class="result-item">
-                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Extracted Text</h3>
-                            <div id="text-result" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
-                        </div>
-                        
-                        <!-- Emoji Result -->
-                        <div class="result-item">
-                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Detected Emojis</h3>
-                            <div id="emoji-result" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg min-h-[50px]">
-                                <div class="emoji-grid"></div>
+                </div>
+
+                <!-- Main Content Area - Upload and Results -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Upload Section -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Upload Card -->
+                        <div class="bg-light-card dark:bg-dark-card rounded-lg shadow-sm border border-light-border dark:border-dark-border p-5 card-gradient">
+                            <h2 class="text-lg font-semibold mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                Image Upload
+                            </h2>
+                            
+                            <div id="upload-area" class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary-400 dark:hover:border-primary-600 transition-colors">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-2">Drag & drop image here</p>
+                                    <button id="browse-button" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 text-white rounded-lg transition-colors font-medium relative overflow-hidden">
+                                        <span>Browse Files</span>
+                                    </button>
+                                    <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">Supports JPG, PNG, GIF formats</p>
+                                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                                </div>
+                                
+                                <!-- Drag overlay hint -->
+                                <div class="drag-hint absolute inset-0 bg-primary-500/10 dark:bg-primary-700/20 rounded-lg border-2 border-primary-500 flex items-center justify-center">
+                                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-lg">
+                                        <p class="text-primary-700 dark:text-primary-300 font-medium">Drop to upload</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview Area -->
+                            <div class="mt-4 relative">
+                                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preview</h3>
+                                <div id="preview-container" class="h-48 flex items-center justify-center border border-light-border dark:border-dark-border rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                                    <p id="no-preview" class="text-gray-500 dark:text-gray-400">No image selected</p>
+                                    <img id="image-preview" class="hidden max-h-full max-w-full object-contain" src="" alt="Preview">
+                                </div>
+                                
+                                <!-- Image Meta Info - Appears when image is loaded -->
+                                <div id="image-meta" class="hidden mt-2 grid grid-cols-2 gap-2 text-xs">
+                                    <div class="flex items-center space-x-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span id="image-dimensions" class="text-gray-600 dark:text-gray-400">0 x 0 px</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span id="image-size" class="text-gray-600 dark:text-gray-400">0 KB</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                                        </svg>
+                                        <span id="image-type" class="text-gray-600 dark:text-gray-400">-</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span id="image-date" class="text-gray-600 dark:text-gray-400">-</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Timestamp Result -->
-                        <div class="result-item">
-                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Timestamp</h3>
-                            <div id="timestamp-result" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
+                        <!-- Process Options -->
+                        <div class="bg-light-card dark:bg-dark-card rounded-lg shadow-sm border border-light-border dark:border-dark-border p-5 card-gradient">
+                            <h2 class="text-lg font-semibold mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Detection Options
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="extract-text" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 dark:peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                                        <span class="ml-3 text-gray-700 dark:text-gray-300">Extract Text</span>
+                                    </label>
+                                    <div class="ml-2 tooltip" data-tooltip="Extract message text from image">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="detect-emojis" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 dark:peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                                        <span class="ml-3 text-gray-700 dark:text-gray-300">Detect Emojis</span>
+                                    </label>
+                                    <div class="ml-2 tooltip" data-tooltip="Identify emojis in the message">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="extract-timestamp" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 dark:bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500 dark:peer-focus:ring-primary-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                                        <span class="ml-3 text-gray-700 dark:text-gray-300">Extract Timestamp</span>
+                                    </label>
+                                    <div class="ml-2 tooltip" data-tooltip="Detect message timestamp if available">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="model-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Detection Model</label>
+                                    <select id="model-select" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                        <option value="cnn">CNN (Highest Accuracy)</option>
+                                        <option value="yolo">YOLO (Faster Processing)</option>
+                                        <option value="transformer">Transformer (Best for Complex Emojis)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <button id="process-button" class="w-full py-3 px-4 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 relative overflow-hidden" disabled>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Process Image</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Processing History -->
+                        <div class="bg-light-card dark:bg-dark-card rounded-lg shadow-sm border border-light-border dark:border-dark-border p-5 card-gradient hidden md:block">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Recent History
+                                </h2>
+                                <button class="text-xs text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300">
+                                    View All
+                                </button>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="h-10 w-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-lg">
+                                        😀
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <div class="flex justify-between">
+                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">detected_emoji_123.jpg</p>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">2m ago</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">4 emojis found</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="h-10 w-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-lg">
+                                        🎉
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <div class="flex justify-between">
+                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">chat_message.png</p>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">15m ago</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">2 emojis found</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="h-10 w-10 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-lg">
+                                        👍
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <div class="flex justify-between">
+                                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">message_snapshot.jpg</p>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">1h ago</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">1 emoji found</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div id="loading-results" class="hidden flex-col items-center justify-center py-10 text-center">
-                        <div class="w-16 h-16 border-4 border-primary-light border-t-primary rounded-full animate-spin mb-4"></div>
-                        <p class="text-gray-600 dark:text-gray-300">Processing your image...</p>
+
+                    <!-- Results Section -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Results Header Card -->
+                        <div class="bg-light-card dark:bg-dark-card rounded-lg shadow-sm border border-light-border dark:border-dark-border p-5 card-gradient">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-lg font-semibold flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    Detection Results
+                                </h2>
+                                <div id="status-badge" class="hidden px-3 py-1 text-xs rounded-full flex items-center space-x-1.5">
+                                    <span id="status-dot" class="w-2 h-2 rounded-full"></span>
+                                    <span id="status-text">Waiting</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Results Content -->
+                            <div id="results-placeholder" class="flex flex-col items-center justify-center py-16 text-center">
+                                <lottie-player src="https://lottie.host/39723990-c9ea-4d3b-b3a7-29ee9e7562ef/9XbR7VA9F9.json" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
+                                <p class="text-gray-500 dark:text-gray-400 mt-4">Upload and process an image to see detection results</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2 max-w-md">The AI will analyze your image, extract text, detect emojis, and identify timestamps</p>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div id="loading-results" class="hidden flex-col items-center justify-center py-16 text-center">
+                                <div class="relative w-24 h-24">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary-200 dark:text-primary-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="w-full h-full border-4 border-primary-200 dark:border-primary-900 rounded-full"></div>
+                                    <div class="absolute top-0 left-0 w-full h-full border-4 border-primary-500 rounded-full animate-spin border-t-transparent"></div>
+                                    <div class="absolute top-0 left-0 w-full h-full border-4 border-transparent rounded-full animate-pulse"></div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-300 mt-6 font-medium">Analyzing Your Image</p>
+                                <p class="text-gray-500 dark:text-gray-400 mt-2 max-w-md text-sm">Our AI is processing the image to detect emojis and extract text</p>
+                                
+                                <!-- Processing steps -->
+                                <div class="w-64 mt-8">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-5 h-5 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs">1</div>
+                                        <div class="h-0.5 flex-1 bg-primary-500 mx-1"></div>
+                                        <div class="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center text-xs">2</div>
+                                        <div class="h-0.5 flex-1 bg-gray-300 dark:bg-gray-700 mx-1"></div>
+                                        <div class="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center text-xs">3</div>
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        <span class="font-medium text-primary-500">Image preprocessing</span> → Emoji detection → Result generation
+                                    </div>
+                                    <div class="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full mt-3 overflow-hidden">
+                                        <div id="progress-bar" class="h-full bg-primary-500 progress-animation" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Results Container -->
+                            <div id="results-container" class="hidden">
+                                <!-- Processing stats -->
+                                <div class="flex flex-wrap -mx-2 mb-6">
+                                    <div class="w-1/2 sm:w-1/4 px-2 mb-4">
+                                        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                                            <div class="text-2xl font-semibold text-primary-500" id="emoji-count">0</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">Emojis Detected</div>
+                                        </div>
+                                    </div>
+                                    <div class="w-1/2 sm:w-1/4 px-2 mb-4">
+                                        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                                            <div class="text-2xl font-semibold text-primary-500" id="text-chars">0</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">Characters</div>
+                                        </div>
+                                    </div>
+                                    <div class="w-1/2 sm:w-1/4 px-2 mb-4">
+                                        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                                            <div class="text-2xl font-semibold text-primary-500" id="processing-time">0ms</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">Processing Time</div>
+                                        </div>
+                                    </div>
+                                    <div class="w-1/2 sm:w-1/4 px-2 mb-4">
+                                        <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                                            <div class="text-2xl font-semibold text-primary-500" id="confidence">0%</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">Confidence Score</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Result Tabs -->
+                                <div class="mb-6">
+                                    <div class="flex border-b border-gray-200 dark:border-gray-700">
+                                        <button class="tab-btn py-2 px-4 text-sm font-medium text-primary-600 dark:text-primary-400 border-b-2 border-primary-500 -mb-px" data-tab="all">All Results</button>
+                                        <button class="tab-btn py-2 px-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-tab="emojis">Emojis</button>
+                                        <button class="tab-btn py-2 px-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-tab="text">Text</button>
+                                        <button class="tab-btn py-2 px-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" data-tab="details">Details</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tab Content -->
+                                <div class="tab-content" data-tab-content="all">
+                                    <!-- Text Result -->
+                                    <div class="mb-6">
+                                        <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                                            </svg>
+                                            Extracted Text
+                                        </h3>
+                                        <div id="text-result" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg min-h-[60px] break-words"></div>
+                                    </div>
+                                    
+                                    <!-- Emoji Result -->
+                                    <div class="mb-6">
+                                        <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Detected Emojis
+                                        </h3>
+                                        <div id="emoji-result" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg min-h-[100px]">
+                                            <div class="emoji-grid"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Timestamp Result -->
+                                    <div>
+                                        <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Timestamp
+                                        </h3>
+                                        <div id="timestamp-result" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content hidden" data-tab-content="emojis">
+                                    <!-- Emoji Details -->
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Emoji Analysis</h3>
+                                            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                                                <div class="flex flex-wrap gap-4" id="detailed-emojis"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Category Distribution</h3>
+                                            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-64">
+                                                <canvas id="emojiCategoryChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content hidden" data-tab-content="text">
+                                    <!-- Text Analysis -->
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Text Reconstruction</h3>
+                                            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 min-h-[120px]" id="text-reconstruction"></div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Character Analysis</h3>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                                                    <h4 class="text-sm font-medium mb-2">Character Count</h4>
+                                                    <div class="space-y-2">
+                                                        <div>
+                                                            <div class="flex justify-between text-xs mb-1">
+                                                                <span>Alphanumeric</span>
+                                                                <span id="alpha-count">0</span>
+                                                            </div>
+                                                            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                                <div id="alpha-bar" class="h-full bg-green-500 rounded-full" style="width: 0%"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="flex justify-between text-xs mb-1">
+                                                                <span>Emoji</span>
+                                                                <span id="emoji-text-count">0</span>
+                                                            </div>
+                                                            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                                <div id="emoji-bar" class="h-full bg-primary-500 rounded-full" style="width: 0%"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="flex justify-between text-xs mb-1">
+                                                                <span>Symbols</span>
+                                                                <span id="symbol-count">0</span>
+                                                            </div>
+                                                            <div class="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                                <div id="symbol-bar" class="h-full bg-yellow-500 rounded-full" style="width: 0%"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                                                    <h4 class="text-sm font-medium mb-2">Confidence Heatmap</h4>
+                                                    <div id="confidence-heatmap" class="p-2 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-sm font-mono h-20 overflow-auto"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-content hidden" data-tab-content="details">
+                                    <!-- Technical Details -->
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Processing Details</h3>
+                                            <div class="bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                                                <div class="grid grid-cols-3 divide-x divide-gray-200 dark:divide-gray-700 text-center">
+                                                    <div class="p-4">
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Model Used</p>
+                                                        <p class="font-medium" id="model-used">CNN</p>
+                                                    </div>
+                                                    <div class="p-4">
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">API Version</p>
+                                                        <p class="font-medium">v2.5.3</p>
+                                                    </div>
+                                                    <div class="p-4">
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Process ID</p>
+                                                        <p class="font-medium" id="process-id">ED-12345</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">JSON Output</h3>
+                                            <div class="rounded-lg overflow-hidden">
+                                                <div class="bg-gray-800 text-gray-200 px-4 py-2 text-sm flex justify-between items-center">
+                                                    <span>Response Data</span>
+                                                    <button id="copy-json" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded transition-colors">
+                                                        Copy JSON
+                                                    </button>
+                                                </div>
+                                                <pre id="json-output" class="bg-gray-900 text-gray-300 p-4 text-xs overflow-x-auto"></pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="mt-8 flex flex-wrap gap-3">
+                                    <button id="save-results" class="flex items-center space-x-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        <span>Save Results</span>
+                                    </button>
+                                    <button id="clear-results" class="flex items-center space-x-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <span>Clear</span>
+                                    </button>
+                                    <button id="share-results" class="flex items-center space-x-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                        </svg>
+                                        <span>Share</span>
+                                    </button>
+                                    <div class="flex-1"></div>
+                                    <button id="process-another" class="flex items-center space-x-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        <span>Process Another</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Documentation Showcase -->
+                        <div class="bg-light-card dark:bg-dark-card rounded-lg shadow-sm border border-light-border dark:border-dark-border p-5 card-gradient">
+                            <h2 class="text-lg font-semibold mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                API Usage Example
+                            </h2>
+                            
+                            <div class="mb-4">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="h-4 w-4 rounded-full bg-red-500"></div>
+                                    <div class="h-4 w-4 rounded-full bg-yellow-500"></div>
+                                    <div class="h-4 w-4 rounded-full bg-green-500"></div>
+                                </div>
+                                <div class="bg-gray-900 text-gray-300 rounded-lg p-4 text-sm font-mono overflow-x-auto">
+<pre>// Detect emojis in an image using the Emoji Detector API
+const detectEmojis = async (imageFile) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  
+  try {
+    const response = await fetch('https://api.emoji-detector.ai/detect', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      },
+      body: formData
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error detecting emojis:', error);
+  }
+}</pre>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                                    <h3 class="font-medium text-sm mb-2">Request Format</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">POST request with image file to the /detect endpoint</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                                    <h3 class="font-medium text-sm mb-2">Authentication</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Bearer token authentication with API key</p>
+                                </div>
+                                <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+                                    <h3 class="font-medium text-sm mb-2">Rate Limits</h3>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">100 requests/minute on free plan</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex justify-end">
+                                <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="text-xs text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 flex items-center">
+                                    <span>View Full Documentation</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
+
+    <!-- Success Toast Notification - Appears after successful processing -->
+    <div id="success-toast" class="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 transform translate-y-20 opacity-0 transition-all duration-500 flex items-center max-w-sm border-l-4 border-green-500 hidden">
+        <div class="text-green-500 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
         </div>
-        
-        <!-- Project Information Section -->
-        <div class="mt-12 bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
-            <h2 class="text-xl font-semibold mb-6">About Emoji Detector AI</h2>
-            <div class="prose dark:prose-dark max-w-none">
-                <p>
-                    <strong>Emoji Detector AI</strong> is a deep learning project that accurately identifies emojis within chat messages. 
-                    It utilizes a custom AI model optimized for recognizing emojis in message text, structured as a Python module with a REST API.
-                </p>
-                
-                <h3 class="mt-4">Key Features</h3>
-                <ul>
-                    <li><strong>Custom CNN Training:</strong> Model trained on labeled emoji datasets</li>
-                    <li><strong>High Accuracy Detection:</strong> Aims for 99.99% accuracy in production</li>
-                    <li><strong>Dockerized Solution:</strong> Runs as a containerized service</li>
-                    <li><strong>Structured JSON Output:</strong> Extracts text, timestamps, and emojis from images</li>
-                    <li><strong>No APIs Required:</strong> Fully open-source implementation</li>
-                    <li><strong>Real-time Processing:</strong> Detects emojis in messages instantly</li>
-                </ul>
-                
-                <h3 class="mt-4">Technology Stack</h3>
-                <p>
-                    The project is built using Python with TensorFlow/PyTorch for the AI model, OpenCV for image processing, 
-                    and Flask/FastAPI for the backend API. The frontend is developed with HTML, CSS, and JavaScript.
-                </p>
-            </div>
+        <div>
+            <h4 class="font-medium text-gray-800 dark:text-gray-200">Process Complete</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Successfully detected <span id="toast-emoji-count">0</span> emojis</p>
         </div>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="mt-12 py-6 border-t border-light-border dark:border-dark-border">
-        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-600 dark:text-gray-400 text-sm">
-                &copy; 2024 Emoji Detector AI. All rights reserved.
-            </p>
-            <div class="flex items-center space-x-4 mt-4 md:mt-0">
-                <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors">
-                    GitHub
-                </a>
-                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors">
-                    Documentation
-                </a>
-                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors">
-                    API
-                </a>
-            </div>
-        </div>
-    </footer>
+        <button class="ml-auto text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
 
     <!-- JavaScript -->
     <script>
@@ -271,43 +1110,193 @@
             const browseButton = document.getElementById('browse-button');
             const imagePreview = document.getElementById('image-preview');
             const noPreview = document.getElementById('no-preview');
+            const imageMeta = document.getElementById('image-meta');
+            const imageDimensions = document.getElementById('image-dimensions');
+            const imageSize = document.getElementById('image-size');
+            const imageType = document.getElementById('image-type');
+            const imageDate = document.getElementById('image-date');
             const processButton = document.getElementById('process-button');
             const statusBadge = document.getElementById('status-badge');
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
             const resultsPlaceholder = document.getElementById('results-placeholder');
             const resultsContainer = document.getElementById('results-container');
             const loadingResults = document.getElementById('loading-results');
+            const progressBar = document.getElementById('progress-bar');
             const textResult = document.getElementById('text-result');
             const emojiResult = document.getElementById('emoji-result');
             const timestampResult = document.getElementById('timestamp-result');
+            const clearResults = document.getElementById('clear-results');
+            const processAnother = document.getElementById('process-another');
             const themeToggle = document.getElementById('theme-toggle');
+            const successToast = document.getElementById('success-toast');
+            const toastEmojiCount = document.getElementById('toast-emoji-count');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sidebar = document.querySelector('aside');
+            const copyJsonBtn = document.getElementById('copy-json');
+            const jsonOutput = document.getElementById('json-output');
+            const saveResults = document.getElementById('save-results');
+            const shareResults = document.getElementById('share-results');
+            const emojiCount = document.getElementById('emoji-count');
+            const textChars = document.getElementById('text-chars');
+            const processingTime = document.getElementById('processing-time');
+            const confidenceScore = document.getElementById('confidence');
+            const modelUsed = document.getElementById('model-used');
+            const processId = document.getElementById('process-id');
+            const modelSelect = document.getElementById('model-select');
+            const detailedEmojis = document.getElementById('detailed-emojis');
+            const textReconstruction = document.getElementById('text-reconstruction');
+            const emojiCategoryChart = document.getElementById('emojiCategoryChart');
+            const alphaCount = document.getElementById('alpha-count');
+            const emojiTextCount = document.getElementById('emoji-text-count');
+            const symbolCount = document.getElementById('symbol-count');
+            const alphaBar = document.getElementById('alpha-bar');
+            const emojiBar = document.getElementById('emoji-bar');
+            const symbolBar = document.getElementById('symbol-bar');
+            const confidenceHeatmap = document.getElementById('confidence-heatmap');
+            
+            // Generate a chart for the activity
+            const activityChart = new Chart(document.getElementById('activityChart'), {
+                type: 'line',
+                data: {
+                    labels: ['12 AM', '2 AM', '4 AM', '6 AM', '8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', '10 PM'],
+                    datasets: [{
+                        label: 'API Calls',
+                        data: [120, 190, 30, 50, 20, 30, 320, 450, 590, 620, 700, 380],
+                        borderColor: '#5D5CDE',
+                        backgroundColor: 'rgba(93, 92, 222, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Mobile Menu Toggle
+            mobileMenuButton.addEventListener('click', function() {
+                if (sidebar.classList.contains('lg:fixed')) {
+                    sidebar.classList.remove('lg:fixed');
+                    sidebar.classList.add('fixed', 'inset-0', 'z-50');
+                } else {
+                    sidebar.classList.add('lg:fixed');
+                    sidebar.classList.remove('fixed', 'inset-0', 'z-50');
+                }
+            });
             
             // Theme Toggle
             themeToggle.addEventListener('click', function() {
                 document.documentElement.classList.toggle('dark');
+                
+                // Update charts if needed when theme changes
+                updateChartsTheme();
+            });
+
+            function updateChartsTheme() {
+                const isDark = document.documentElement.classList.contains('dark');
+                
+                // Update activity chart
+                activityChart.options.scales.y.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                activityChart.options.scales.x.color = isDark ? '#fff' : '#666';
+                activityChart.options.scales.y.color = isDark ? '#fff' : '#666';
+                activityChart.update();
+                
+                // Update emoji category chart if it exists
+                if (window.emojiCatChart) {
+                    window.emojiCatChart.options.plugins.legend.labels.color = isDark ? '#fff' : '#666';
+                    window.emojiCatChart.update();
+                }
+            }
+            
+            // Tab switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active state from all buttons
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('text-primary-600', 'dark:text-primary-400', 'border-b-2', 'border-primary-500', '-mb-px');
+                        btn.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-300');
+                    });
+                    
+                    // Add active state to clicked button
+                    button.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-700', 'dark:hover:text-gray-300');
+                    button.classList.add('text-primary-600', 'dark:text-primary-400', 'border-b-2', 'border-primary-500', '-mb-px');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show selected tab content
+                    const tabName = button.getAttribute('data-tab');
+                    const activeContent = document.querySelector(`.tab-content[data-tab-content="${tabName}"]`);
+                    activeContent.classList.remove('hidden');
+                });
             });
             
-            // File Upload
+            // File Upload with ripple effect
+            function createRipple(button, event) {
+                const circle = document.createElement("span");
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+                
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+                circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+                circle.classList.add("ripple");
+                
+                const ripple = button.getElementsByClassName("ripple")[0];
+                if (ripple) {
+                    ripple.remove();
+                }
+                
+                button.appendChild(circle);
+            }
+            
+            browseButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                createRipple(this, e);
+                fileInput.click();
+            });
+            
             uploadArea.addEventListener('click', function() {
                 fileInput.click();
             });
             
-            browseButton.addEventListener('click', function(e) {
-                e.stopPropagation();
-                fileInput.click();
-            });
-            
+            // Drag and drop
             uploadArea.addEventListener('dragover', function(e) {
                 e.preventDefault();
-                this.classList.add('border-primary', 'dark:border-primary-light');
+                this.classList.add('drag-active');
             });
             
             uploadArea.addEventListener('dragleave', function() {
-                this.classList.remove('border-primary', 'dark:border-primary-light');
+                this.classList.remove('drag-active');
             });
             
             uploadArea.addEventListener('drop', function(e) {
                 e.preventDefault();
-                this.classList.remove('border-primary', 'dark:border-primary-light');
+                this.classList.remove('drag-active');
                 
                 if (e.dataTransfer.files.length) {
                     fileInput.files = e.dataTransfer.files;
@@ -323,7 +1312,7 @@
             
             function handleFileSelect(file) {
                 if (!file.type.match('image.*')) {
-                    alert('Please select an image file');
+                    showToast('error', 'Please select an image file');
                     return;
                 }
                 
@@ -334,24 +1323,81 @@
                     imagePreview.classList.remove('hidden');
                     noPreview.classList.add('hidden');
                     processButton.disabled = false;
+                    
+                    // Show image metadata
+                    imageMeta.classList.remove('hidden');
+                    
+                    // Create a temporary image to get dimensions
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        imageDimensions.textContent = `${this.width} x ${this.height} px`;
+                    };
+                    tempImg.src = e.target.result;
+                    
+                    // Size in KB
+                    const sizeKB = Math.round(file.size / 1024);
+                    imageSize.textContent = `${sizeKB} KB`;
+                    
+                    // Image type
+                    imageType.textContent = file.type.split('/')[1].toUpperCase();
+                    
+                    // Last modified date
+                    const date = new Date(file.lastModified);
+                    imageDate.textContent = date.toLocaleDateString();
                 };
                 
                 reader.readAsDataURL(file);
             }
             
+            // Copy JSON button
+            copyJsonBtn.addEventListener('click', function() {
+                const json = jsonOutput.textContent;
+                navigator.clipboard.writeText(json).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+            
             // Process Image
-            processButton.addEventListener('click', function() {
+            processButton.addEventListener('click', function(e) {
+                createRipple(this, e);
+                
                 // Show loading state
                 resultsPlaceholder.classList.add('hidden');
                 resultsContainer.classList.add('hidden');
                 loadingResults.classList.remove('hidden');
+                
+                // Update status badge
                 statusBadge.classList.remove('hidden');
-                statusBadge.textContent = 'Processing';
-                statusBadge.classList.add('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
-                statusBadge.classList.remove('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200', 'bg-red-200', 'dark:bg-red-800', 'text-red-800', 'dark:text-red-200');
+                statusDot.classList.add('bg-yellow-500', 'animate-pulse');
+                statusDot.classList.remove('bg-green-500', 'bg-red-500');
+                statusText.textContent = 'Processing';
+                statusBadge.classList.add('bg-yellow-100', 'dark:bg-yellow-900/30', 'text-yellow-800', 'dark:text-yellow-200');
+                statusBadge.classList.remove('bg-green-100', 'dark:bg-green-900/30', 'text-green-800', 'dark:text-green-200', 'bg-red-100', 'dark:bg-red-900/30', 'text-red-800', 'dark:text-red-200');
+                
+                // Animate progress bar
+                progressBar.style.width = '0%';
+                progressBar.classList.add('progress-animation');
+                
+                // Simulate API call with staged progress updates
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                    }
+                }, 100);
                 
                 // Simulate API call with timeout
                 setTimeout(function() {
+                    clearInterval(progressInterval);
+                    progressBar.style.width = '100%';
+                    
                     // For demo purposes, we'll simulate a response
                     const mockResponse = getMockResponse();
                     
@@ -363,9 +1409,17 @@
                     resultsContainer.classList.remove('hidden');
                     
                     // Update status badge
-                    statusBadge.textContent = 'Completed';
-                    statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
-                    statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                    statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
+                    statusDot.classList.add('bg-green-500');
+                    statusText.textContent = 'Completed';
+                    statusBadge.classList.remove('bg-yellow-100', 'dark:bg-yellow-900/30', 'text-yellow-800', 'dark:text-yellow-200');
+                    statusBadge.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-800', 'dark:text-green-200');
+                    
+                    // Show toast notification
+                    showSuccessToast(mockResponse.emojis.length);
+                    
+                    // Create and update charts
+                    createEmojiCategoryChart();
                 }, 2000);
             });
             
@@ -373,25 +1427,54 @@
                 // This creates different mock responses randomly
                 const responses = [
                     {
-                        text: "Hey! 😃 What's up? Feeling great today! 👍",
-                        emojis: ["😃", "👍"],
-                        timestamp: "2024-01-01T12:34:56Z"
+                        text: "Hey! 😃 What's up? Feeling great today! 👍 I just got a new laptop 💻",
+                        emojis: ["😃", "👍", "💻"],
+                        emojiData: [
+                            { emoji: "😃", confidence: 0.98, category: "Smileys & Emotions", position: { x: 120, y: 45 }, size: 32 },
+                            { emoji: "👍", confidence: 0.95, category: "People & Body", position: { x: 280, y: 45 }, size: 32 },
+                            { emoji: "💻", confidence: 0.93, category: "Objects", position: { x: 420, y: 45 }, size: 32 }
+                        ],
+                        timestamp: "2024-04-15T14:34:56Z",
+                        processingTime: "4.2ms",
+                        confidence: 0.97,
+                        modelUsed: "CNN",
+                        processId: "ED-" + Math.floor(10000 + Math.random() * 90000)
                     },
                     {
-                        text: "OMG that's so funny! 😂🤣 I can't stop laughing!",
-                        emojis: ["😂", "🤣"],
-                        timestamp: "2024-02-15T09:23:45Z"
+                        text: "OMG that's so funny! 😂🤣 I can't stop laughing! Let's celebrate 🎉",
+                        emojis: ["😂", "🤣", "🎉"],
+                        emojiData: [
+                            { emoji: "😂", confidence: 0.99, category: "Smileys & Emotions", position: { x: 150, y: 45 }, size: 32 },
+                            { emoji: "🤣", confidence: 0.97, category: "Smileys & Emotions", position: { x: 190, y: 45 }, size: 32 },
+                            { emoji: "🎉", confidence: 0.96, category: "Activities", position: { x: 390, y: 45 }, size: 32 }
+                        ],
+                        timestamp: "2024-04-15T15:42:18Z",
+                        processingTime: "5.1ms",
+                        confidence: 0.98,
+                        modelUsed: "YOLO",
+                        processId: "ED-" + Math.floor(10000 + Math.random() * 90000)
                     },
                     {
-                        text: "This is amazing! 🎉🥳 Congratulations on your achievement! 🏆",
-                        emojis: ["🎉", "🥳", "🏆"],
-                        timestamp: "2024-03-10T15:42:18Z"
+                        text: "This is amazing! 🎉🥳 Congratulations on your achievement! 🏆 Let's go for coffee ☕ and cake 🍰",
+                        emojis: ["🎉", "🥳", "🏆", "☕", "🍰"],
+                        emojiData: [
+                            { emoji: "🎉", confidence: 0.97, category: "Activities", position: { x: 130, y: 45 }, size: 32 },
+                            { emoji: "🥳", confidence: 0.94, category: "Smileys & Emotions", position: { x: 170, y: 45 }, size: 32 },
+                            { emoji: "🏆", confidence: 0.98, category: "Activities", position: { x: 320, y: 45 }, size: 32 },
+                            { emoji: "☕", confidence: 0.93, category: "Food & Drink", position: { x: 420, y: 45 }, size: 32 },
+                            { emoji: "🍰", confidence: 0.95, category: "Food & Drink", position: { x: 450, y: 45 }, size: 32 }
+                        ],
+                        timestamp: "2024-04-16T09:23:45Z",
+                        processingTime: "5.8ms",
+                        confidence: 0.96,
+                        modelUsed: "Transformer",
+                        processId: "ED-" + Math.floor(10000 + Math.random() * 90000)
                     }
                 ];
                 
                 return responses[Math.floor(Math.random() * responses.length)];
             }
-            
+
             function updateResults(response) {
                 // Update text
                 textResult.textContent = response.text;
@@ -402,14 +1485,381 @@
                 
                 response.emojis.forEach(emoji => {
                     const emojiElement = document.createElement('div');
-                    emojiElement.className = 'bg-white dark:bg-gray-700 rounded-lg p-2 text-center text-3xl';
+                    emojiElement.className = 'bg-white dark:bg-gray-700 rounded-lg p-3 text-center text-4xl shadow-sm hover:shadow-md transition-all cursor-pointer hover:-translate-y-1';
                     emojiElement.textContent = emoji;
+                    emojiElement.addEventListener('click', () => {
+                        // Add spotlight effect
+                        emojiElement.classList.add('emoji-spotlight');
+                        setTimeout(() => {
+                            emojiElement.classList.remove('emoji-spotlight');
+                        }, 3000);
+                    });
                     emojiGrid.appendChild(emojiElement);
                 });
                 
                 // Update timestamp
                 const date = new Date(response.timestamp);
                 timestampResult.textContent = date.toLocaleString();
+                
+                // Update statistics
+                emojiCount.textContent = response.emojis.length;
+                textChars.textContent = response.text.length;
+                processingTime.textContent = response.processingTime;
+                confidenceScore.textContent = Math.round(response.confidence * 100) + '%';
+                
+                // Update model info
+                modelUsed.textContent = response.modelUsed;
+                processId.textContent = response.processId;
+                
+                // Update JSON output
+                jsonOutput.textContent = JSON.stringify(response, null, 2);
+                
+                // Update emoji details tab
+                updateEmojiDetails(response);
+                
+                // Update text analysis tab
+                updateTextAnalysis(response);
+            }
+            
+            function updateEmojiDetails(response) {
+                // Clear current detailed emojis
+                detailedEmojis.innerHTML = '';
+                
+                // Add each emoji with details
+                response.emojiData.forEach(data => {
+                    const emojiDetail = document.createElement('div');
+                    emojiDetail.className = 'bg-white dark:bg-gray-700 rounded-lg p-3 shadow-sm';
+                    
+                    const confidencePercentage = Math.round(data.confidence * 100);
+                    
+                    emojiDetail.innerHTML = `
+                        <div class="text-center mb-2 text-3xl">${data.emoji}</div>
+                        <div class="space-y-1">
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Category</div>
+                            <div class="text-sm font-medium">${data.category}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Confidence</div>
+                            <div class="h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                <div class="h-full bg-primary-500 rounded-full" style="width: ${confidencePercentage}%"></div>
+                            </div>
+                            <div class="text-right text-xs font-medium">${confidencePercentage}%</div>
+                        </div>
+                    `;
+                    
+                    detailedEmojis.appendChild(emojiDetail);
+                });
+            }
+            
+            function updateTextAnalysis(response) {
+                // Update text reconstruction
+                const text = response.text;
+                let coloredText = '';
+                
+                // Find emojis in text and highlight them
+                let lastIndex = 0;
+                
+                for (const emojiData of response.emojiData) {
+                    const emoji = emojiData.emoji;
+                    const emojiIndex = text.indexOf(emoji, lastIndex);
+                    
+                    if (emojiIndex !== -1) {
+                        // Add text before emoji
+                        coloredText += text.substring(lastIndex, emojiIndex);
+                        // Add highlighted emoji
+                        coloredText += `<span class="bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded px-1">${emoji}</span>`;
+                        
+                        lastIndex = emojiIndex + emoji.length;
+                    }
+                }
+                
+                // Add remaining text
+                if (lastIndex < text.length) {
+                    coloredText += text.substring(lastIndex);
+                }
+                
+                textReconstruction.innerHTML = coloredText;
+                
+                // Update character analysis
+                const alphaNumCount = text.replace(/[^\w\s]/g, '').length;
+                const emojisCount = response.emojis.reduce((acc, emoji) => acc + emoji.length, 0);
+                const symbolsCount = text.length - alphaNumCount - emojisCount;
+                
+                alphaCount.textContent = alphaNumCount;
+                emojiTextCount.textContent = emojisCount;
+                symbolCount.textContent = symbolsCount;
+                
+                const total = alphaNumCount + emojisCount + symbolsCount;
+                alphaBar.style.width = `${(alphaNumCount / total) * 100}%`;
+                emojiBar.style.width = `${(emojisCount / total) * 100}%`;
+                symbolBar.style.width = `${(symbolsCount / total) * 100}%`;
+                
+                // Update confidence heatmap
+                confidenceHeatmap.innerHTML = '';
+                let heatmapHtml = '';
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    let confidence = 0.9 + Math.random() * 0.09; // Simulate high confidence
+                    let color = 'transparent';
+                    let textColor = 'inherit';
+                    
+                    // Check if this character is part of an emoji
+                    const isEmoji = response.emojiData.some(data => {
+                        const emoji = data.emoji;
+                        const emojiIndex = text.indexOf(emoji);
+                        return i >= emojiIndex && i < emojiIndex + emoji.length;
+                    });
+                    
+                    if (isEmoji) {
+                        // Use the actual confidence from emoji data
+                        const emojiData = response.emojiData.find(data => {
+                            const emoji = data.emoji;
+                            const emojiIndex = text.indexOf(emoji);
+                            return i >= emojiIndex && i < emojiIndex + emoji.length;
+                        });
+                        
+                        confidence = emojiData.confidence;
+                        color = `rgba(93, 92, 222, ${confidence})`;
+                        textColor = confidence > 0.7 ? 'white' : 'inherit';
+                    } else if (char !== ' ') {
+                        // Non-whitespace characters get a confidence color
+                        color = `rgba(0, 128, 0, ${confidence})`;
+                        textColor = confidence > 0.7 ? 'white' : 'inherit';
+                    }
+                    
+                    heatmapHtml += `<span style="background-color: ${color}; color: ${textColor}" title="${Math.round(confidence * 100)}% confidence">${char}</span>`;
+                }
+                
+                confidenceHeatmap.innerHTML = heatmapHtml;
+            }
+            
+            function createEmojiCategoryChart() {
+                // Categories and counts
+                const categories = {
+                    'Smileys & Emotions': 0,
+                    'People & Body': 0,
+                    'Activities': 0,
+                    'Food & Drink': 0,
+                    'Travel & Places': 0,
+                    'Objects': 0,
+                    'Symbols': 0,
+                    'Flags': 0
+                };
+                
+                // Count from response data
+                const mockResponse = getMockResponse();
+                mockResponse.emojiData.forEach(data => {
+                    if (categories[data.category] !== undefined) {
+                        categories[data.category]++;
+                    }
+                });
+                
+                // Fill in random values for empty categories for demo
+                for (const category in categories) {
+                    if (categories[category] === 0) {
+                        if (Math.random() > 0.7) {
+                            categories[category] = Math.floor(Math.random() * 3) + 1;
+                        }
+                    }
+                }
+                
+                // Create chart
+                const ctx = emojiCategoryChart.getContext('2d');
+                
+                if (window.emojiCatChart) {
+                    window.emojiCatChart.destroy();
+                }
+                
+                window.emojiCatChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(categories),
+                        datasets: [{
+                            data: Object.values(categories),
+                            backgroundColor: [
+                                '#5D5CDE', // Primary
+                                '#8584FF', // Primary Light
+                                '#4B4AB2', // Primary Dark
+                                '#10B981', // Success
+                                '#F59E0B', // Warning
+                                '#EF4444', // Danger
+                                '#8B5CF6', // Purple
+                                '#EC4899'  // Pink
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#666',
+                                    padding: 10,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Show success toast
+            function showSuccessToast(emojiCount) {
+                toastEmojiCount.textContent = emojiCount;
+                successToast.classList.remove('hidden', 'translate-y-20', 'opacity-0');
+                
+                setTimeout(() => {
+                    successToast.classList.add('translate-y-20', 'opacity-0');
+                    setTimeout(() => {
+                        successToast.classList.add('hidden');
+                    }, 500);
+                }, 5000);
+            }
+            
+            // Clear results button
+            clearResults.addEventListener('click', function() {
+                resultsContainer.classList.add('hidden');
+                resultsPlaceholder.classList.remove('hidden');
+                statusBadge.classList.add('hidden');
+                
+                // Reset preview
+                imagePreview.classList.add('hidden');
+                noPreview.classList.remove('hidden');
+                imageMeta.classList.add('hidden');
+                processButton.disabled = true;
+                fileInput.value = '';
+            });
+            
+            // Process another button
+            processAnother.addEventListener('click', function() {
+                // Scroll to upload area
+                uploadArea.scrollIntoView({ behavior: 'smooth' });
+                
+                // Highlight upload area
+                uploadArea.classList.add('border-primary-500', 'dark:border-primary-500', 'shadow-glow');
+                setTimeout(() => {
+                    uploadArea.classList.remove('border-primary-500', 'dark:border-primary-500', 'shadow-glow');
+                }, 2000);
+            });
+            
+            // Save results button
+            saveResults.addEventListener('click', function() {
+                const mockResponse = JSON.parse(jsonOutput.textContent);
+                const blob = new Blob([JSON.stringify(mockResponse, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `emoji-detection-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('success', 'Results saved successfully');
+            });
+            
+            // Share results button
+            shareResults.addEventListener('click', function() {
+                // Check if Web Share API is available
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Emoji Detection Results',
+                        text: 'Check out these emojis I detected with Emoji Detector AI!',
+                        url: window.location.href
+                    })
+                    .then(() => showToast('success', 'Shared successfully'))
+                    .catch(err => showToast('error', 'Error sharing: ' + err));
+                } else {
+                    // Fallback to clipboard copy
+                    const mockResponse = JSON.parse(jsonOutput.textContent);
+                    navigator.clipboard.writeText(JSON.stringify(mockResponse, null, 2))
+                        .then(() => showToast('success', 'Results copied to clipboard'))
+                        .catch(err => showToast('error', 'Could not copy results: ' + err));
+                }
+            });
+            
+            // General toast function
+            function showToast(type, message) {
+                const toast = document.createElement('div');
+                toast.className = `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transform transition-all duration-500 flex items-center max-w-sm border-l-4 z-50`;
+                
+                if (type === 'success') {
+                    toast.classList.add('bg-white', 'dark:bg-gray-800', 'border-green-500');
+                    toast.innerHTML = `
+                        <div class="text-green-500 mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 dark:text-gray-200">Success</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${message}</p>
+                        </div>
+                        <button class="ml-auto text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 toast-close">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    `;
+                } else if (type === 'error') {
+                    toast.classList.add('bg-white', 'dark:bg-gray-800', 'border-red-500');
+                    toast.innerHTML = `
+                        <div class="text-red-500 mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 dark:text-gray-200">Error</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${message}</p>
+                        </div>
+                        <button class="ml-auto text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 toast-close">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    `;
+                }
+                
+                document.body.appendChild(toast);
+                
+                // Animate in
+                setTimeout(() => {
+                    toast.classList.add('translate-y-0', 'opacity-100');
+                }, 10);
+                
+                // Setup close button
+                toast.querySelector('.toast-close').addEventListener('click', () => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 500);
+                });
+                
+                // Auto dismiss
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        toast.classList.add('translate-y-20', 'opacity-0');
+                        setTimeout(() => {
+                            if (document.body.contains(toast)) {
+                                document.body.removeChild(toast);
+                            }
+                        }, 500);
+                    }
+                }, 5000);
+            }
+            
+            // For demo purposes, show a simulated active user count
+            function updateActiveUsers() {
+                let count = Math.floor(Math.random() * 500) + 1500;
+                document.getElementById('active-users').textContent = count.toLocaleString();
+                
+                // Update every 5-10 seconds
+                setTimeout(updateActiveUsers, Math.random() * 5000 + 5000);
             }
             
             // For demo purposes, let's simulate a real API call with @Claude-3.7-Sonnet if available
@@ -460,9 +1910,11 @@
                                 resultsContainer.classList.remove('hidden');
                                 
                                 // Update status badge
-                                statusBadge.textContent = 'Completed';
-                                statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
-                                statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                                statusDot.classList.remove('bg-yellow-500', 'animate-pulse');
+                                statusDot.classList.add('bg-green-500');
+                                statusText.textContent = 'Completed';
+                                statusBadge.classList.remove('bg-yellow-100', 'dark:bg-yellow-900/30', 'text-yellow-800', 'dark:text-yellow-200');
+                                statusBadge.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-800', 'dark:text-green-200');
                             }
                         });
                         
@@ -483,8 +1935,8 @@
                             loadingResults.classList.add('hidden');
                             resultsContainer.classList.remove('hidden');
                             statusBadge.textContent = 'Completed';
-                            statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
-                            statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                            statusBadge.classList.remove('bg-yellow-100', 'dark:bg-yellow-900/30', 'text-yellow-800', 'dark:text-yellow-200');
+                            statusBadge.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-800', 'dark:text-green-200');
                         }, 2000);
                     }
                 } else {
@@ -494,8 +1946,8 @@
                         loadingResults.classList.add('hidden');
                         resultsContainer.classList.remove('hidden');
                         statusBadge.textContent = 'Completed';
-                        statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
-                        statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                        statusBadge.classList.remove('bg-yellow-100', 'dark:bg-yellow-900/30', 'text-yellow-800', 'dark:text-yellow-200');
+                        statusBadge.classList.add('bg-green-100', 'dark:bg-green-900/30', 'text-green-800', 'dark:text-green-200');
                     }, 2000);
                 }
             }
