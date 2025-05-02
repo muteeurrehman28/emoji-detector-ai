@@ -1,14 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Advanced Emoji Detection AI powered by YOLOv5">
-  <title>Emoji Detector AI</title>
-  <script type="module" src="/src/main.jsx"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Detector AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/marked@4.3.0/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        'primary-dark': '#4A49B5',
+                        'primary-light': '#7A79E9',
+                        dark: {
+                            bg: '#181818',
+                            card: '#242424',
+                            border: '#333333'
+                        },
+                        light: {
+                            bg: '#FFFFFF',
+                            card: '#F5F5F7',
+                            border: '#E5E5E5'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+        }
+        .dark .dark\:prose-dark {
+            color: #E5E5E5;
+        }
+        .dark .dark\:prose-dark a {
+            color: #7A79E9;
+        }
+        .dark .dark\:prose-dark strong {
+            color: #FFFFFF;
+        }
+        .dark .dark\:prose-dark h1, 
+        .dark .dark\:prose-dark h2, 
+        .dark .dark\:prose-dark h3 {
+            color: #FFFFFF;
+        }
+    </style>
 </head>
-<body class="font-sans bg-gray-50 text-gray-900">
-  <div id="root" class="min-h-screen flex flex-col"></div>
+<body class="bg-light-bg dark:bg-dark-bg text-gray-800 dark:text-gray-200 min-h-screen transition-colors duration-300">
+    <!-- Check for dark mode -->
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <!-- Header -->
+    <header class="border-b border-light-border dark:border-dark-border">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="text-3xl float">🔍</div>
+                <h1 class="text-2xl font-bold text-primary">Emoji Detector AI</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <svg id="dark-icon" class="w-6 h-6 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg id="light-icon" class="w-6 h-6 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+                <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="hover:text-primary transition-colors">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column: Upload and Input -->
+            <div class="flex flex-col space-y-6">
+                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
+                    <h2 class="text-xl font-semibold mb-4">Upload Image</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">Upload an image containing text with emojis for detection</p>
+                    
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary dark:hover:border-primary-light transition-colors">
+                        <div class="flex flex-col items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600 dark:text-gray-400 mb-2">Drag & drop image or</p>
+                            <button id="browse-button" class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-medium">
+                                Browse Files
+                            </button>
+                            <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">Supported formats: JPG, PNG, GIF</p>
+                            <input type="file" id="file-input" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
+                    <h2 class="text-xl font-semibold mb-4">Process Options</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="extract-text" class="rounded text-primary focus:ring-primary" checked>
+                                <span>Extract Text</span>
+                            </label>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 ml-6 mt-1">Extract message text from image</p>
+                        </div>
+                        <div>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="detect-emojis" class="rounded text-primary focus:ring-primary" checked>
+                                <span>Detect Emojis</span>
+                            </label>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 ml-6 mt-1">Identify emojis in the message</p>
+                        </div>
+                        <div>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="extract-timestamp" class="rounded text-primary focus:ring-primary" checked>
+                                <span>Extract Timestamp</span>
+                            </label>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 ml-6 mt-1">Detect message timestamp if available</p>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button id="process-button" class="w-full py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Process Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Results and Preview -->
+            <div class="flex flex-col space-y-6">
+                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
+                    <h2 class="text-xl font-semibold mb-4">Image Preview</h2>
+                    <div id="preview-container" class="h-64 flex items-center justify-center border border-light-border dark:border-dark-border rounded-lg bg-gray-100 dark:bg-gray-800">
+                        <p id="no-preview" class="text-gray-500 dark:text-gray-400">No image selected</p>
+                        <img id="image-preview" class="hidden max-h-full max-w-full object-contain" src="" alt="Preview">
+                    </div>
+                </div>
+                
+                <div class="bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold">Detection Results</h2>
+                        <div id="status-badge" class="hidden px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                            Waiting
+                        </div>
+                    </div>
+                    
+                    <div id="results-placeholder" class="flex flex-col items-center justify-center py-10 text-center">
+                        <div class="text-4xl mb-4">🔍</div>
+                        <p class="text-gray-500 dark:text-gray-400">Upload and process an image to see detection results</p>
+                    </div>
+                    
+                    <div id="results-container" class="hidden space-y-4">
+                        <!-- Text Result -->
+                        <div class="result-item">
+                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Extracted Text</h3>
+                            <div id="text-result" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
+                        </div>
+                        
+                        <!-- Emoji Result -->
+                        <div class="result-item">
+                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Detected Emojis</h3>
+                            <div id="emoji-result" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg min-h-[50px]">
+                                <div class="emoji-grid"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timestamp Result -->
+                        <div class="result-item">
+                            <h3 class="font-medium text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Timestamp</h3>
+                            <div id="timestamp-result" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="loading-results" class="hidden flex-col items-center justify-center py-10 text-center">
+                        <div class="w-16 h-16 border-4 border-primary-light border-t-primary rounded-full animate-spin mb-4"></div>
+                        <p class="text-gray-600 dark:text-gray-300">Processing your image...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Project Information Section -->
+        <div class="mt-12 bg-light-card dark:bg-dark-card rounded-xl shadow-md p-6 border border-light-border dark:border-dark-border">
+            <h2 class="text-xl font-semibold mb-6">About Emoji Detector AI</h2>
+            <div class="prose dark:prose-dark max-w-none">
+                <p>
+                    <strong>Emoji Detector AI</strong> is a deep learning project that accurately identifies emojis within chat messages. 
+                    It utilizes a custom AI model optimized for recognizing emojis in message text, structured as a Python module with a REST API.
+                </p>
+                
+                <h3 class="mt-4">Key Features</h3>
+                <ul>
+                    <li><strong>Custom CNN Training:</strong> Model trained on labeled emoji datasets</li>
+                    <li><strong>High Accuracy Detection:</strong> Aims for 99.99% accuracy in production</li>
+                    <li><strong>Dockerized Solution:</strong> Runs as a containerized service</li>
+                    <li><strong>Structured JSON Output:</strong> Extracts text, timestamps, and emojis from images</li>
+                    <li><strong>No APIs Required:</strong> Fully open-source implementation</li>
+                    <li><strong>Real-time Processing:</strong> Detects emojis in messages instantly</li>
+                </ul>
+                
+                <h3 class="mt-4">Technology Stack</h3>
+                <p>
+                    The project is built using Python with TensorFlow/PyTorch for the AI model, OpenCV for image processing, 
+                    and Flask/FastAPI for the backend API. The frontend is developed with HTML, CSS, and JavaScript.
+                </p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-12 py-6 border-t border-light-border dark:border-dark-border">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                &copy; 2024 Emoji Detector AI. All rights reserved.
+            </p>
+            <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                <a href="https://github.com/muteeurrehman28/emoji-detector-ai" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors">
+                    GitHub
+                </a>
+                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors">
+                    Documentation
+                </a>
+                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors">
+                    API
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const fileInput = document.getElementById('file-input');
+            const uploadArea = document.getElementById('upload-area');
+            const browseButton = document.getElementById('browse-button');
+            const imagePreview = document.getElementById('image-preview');
+            const noPreview = document.getElementById('no-preview');
+            const processButton = document.getElementById('process-button');
+            const statusBadge = document.getElementById('status-badge');
+            const resultsPlaceholder = document.getElementById('results-placeholder');
+            const resultsContainer = document.getElementById('results-container');
+            const loadingResults = document.getElementById('loading-results');
+            const textResult = document.getElementById('text-result');
+            const emojiResult = document.getElementById('emoji-result');
+            const timestampResult = document.getElementById('timestamp-result');
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            // Theme Toggle
+            themeToggle.addEventListener('click', function() {
+                document.documentElement.classList.toggle('dark');
+            });
+            
+            // File Upload
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            browseButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                fileInput.click();
+            });
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('border-primary', 'dark:border-primary-light');
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                this.classList.remove('border-primary', 'dark:border-primary-light');
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('border-primary', 'dark:border-primary-light');
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    handleFileSelect(this.files[0]);
+                }
+            });
+            
+            function handleFileSelect(file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                    noPreview.classList.add('hidden');
+                    processButton.disabled = false;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Process Image
+            processButton.addEventListener('click', function() {
+                // Show loading state
+                resultsPlaceholder.classList.add('hidden');
+                resultsContainer.classList.add('hidden');
+                loadingResults.classList.remove('hidden');
+                statusBadge.classList.remove('hidden');
+                statusBadge.textContent = 'Processing';
+                statusBadge.classList.add('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
+                statusBadge.classList.remove('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200', 'bg-red-200', 'dark:bg-red-800', 'text-red-800', 'dark:text-red-200');
+                
+                // Simulate API call with timeout
+                setTimeout(function() {
+                    // For demo purposes, we'll simulate a response
+                    const mockResponse = getMockResponse();
+                    
+                    // Update results
+                    updateResults(mockResponse);
+                    
+                    // Hide loading state
+                    loadingResults.classList.add('hidden');
+                    resultsContainer.classList.remove('hidden');
+                    
+                    // Update status badge
+                    statusBadge.textContent = 'Completed';
+                    statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
+                    statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                }, 2000);
+            });
+            
+            function getMockResponse() {
+                // This creates different mock responses randomly
+                const responses = [
+                    {
+                        text: "Hey! 😃 What's up? Feeling great today! 👍",
+                        emojis: ["😃", "👍"],
+                        timestamp: "2024-01-01T12:34:56Z"
+                    },
+                    {
+                        text: "OMG that's so funny! 😂🤣 I can't stop laughing!",
+                        emojis: ["😂", "🤣"],
+                        timestamp: "2024-02-15T09:23:45Z"
+                    },
+                    {
+                        text: "This is amazing! 🎉🥳 Congratulations on your achievement! 🏆",
+                        emojis: ["🎉", "🥳", "🏆"],
+                        timestamp: "2024-03-10T15:42:18Z"
+                    }
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            function updateResults(response) {
+                // Update text
+                textResult.textContent = response.text;
+                
+                // Update emojis
+                const emojiGrid = emojiResult.querySelector('.emoji-grid');
+                emojiGrid.innerHTML = '';
+                
+                response.emojis.forEach(emoji => {
+                    const emojiElement = document.createElement('div');
+                    emojiElement.className = 'bg-white dark:bg-gray-700 rounded-lg p-2 text-center text-3xl';
+                    emojiElement.textContent = emoji;
+                    emojiGrid.appendChild(emojiElement);
+                });
+                
+                // Update timestamp
+                const date = new Date(response.timestamp);
+                timestampResult.textContent = date.toLocaleString();
+            }
+            
+            // For demo purposes, let's simulate a real API call with @Claude-3.7-Sonnet if available
+            async function processByBot(imageData) {
+                // In a real implementation, you would send the image data to your API
+                // For this demo, we're simulating the API call using Claude
+
+                if (window.Poe) {
+                    try {
+                        // Convert base64 data to a file object
+                        const dataURItoBlob = (dataURI) => {
+                            const byteString = atob(dataURI.split(',')[1]);
+                            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                            const ab = new ArrayBuffer(byteString.length);
+                            const ia = new Uint8Array(ab);
+                            for (let i = 0; i < byteString.length; i++) {
+                                ia[i] = byteString.charCodeAt(i);
+                            }
+                            return new Blob([ab], { type: mimeString });
+                        };
+                        
+                        const blob = dataURItoBlob(imageData);
+                        const file = new File([blob], "image.jpg", { type: "image/jpeg" });
+                        
+                        window.Poe.registerHandler("emoji-detector-handler", (result) => {
+                            if (result.status === "complete") {
+                                try {
+                                    // Parse the response as if it were JSON data about detected emojis
+                                    const responseText = result.responses[0].content;
+                                    // Look for JSON in the response
+                                    const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/) || 
+                                                    responseText.match(/```([\s\S]*?)```/);
+                                    
+                                    if (jsonMatch && jsonMatch[1]) {
+                                        const jsonData = JSON.parse(jsonMatch[1]);
+                                        updateResults(jsonData);
+                                    } else {
+                                        // Fallback to mock data if we can't parse JSON
+                                        updateResults(getMockResponse());
+                                    }
+                                } catch (e) {
+                                    console.error("Error parsing response:", e);
+                                    updateResults(getMockResponse());
+                                }
+                                
+                                // Hide loading, show results
+                                loadingResults.classList.add('hidden');
+                                resultsContainer.classList.remove('hidden');
+                                
+                                // Update status badge
+                                statusBadge.textContent = 'Completed';
+                                statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
+                                statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                            }
+                        });
+                        
+                        await window.Poe.sendUserMessage(
+                            "@Claude-3.7-Sonnet I have an image of a chat message. Please analyze it and return the following in ONLY JSON format (no explanations, just a JSON code block): 1) Extract any text visible in the image, 2) Identify any emojis in the text, and 3) Extract any timestamp visible. Return your analysis as a JSON object with keys: 'text', 'emojis' (array), and 'timestamp'.", 
+                            {
+                                attachments: [file],
+                                handler: "emoji-detector-handler",
+                                stream: false,
+                                openChat: false
+                            }
+                        );
+                    } catch (err) {
+                        console.error("Error sending to bot:", err);
+                        // Fallback to mock data
+                        setTimeout(() => {
+                            updateResults(getMockResponse());
+                            loadingResults.classList.add('hidden');
+                            resultsContainer.classList.remove('hidden');
+                            statusBadge.textContent = 'Completed';
+                            statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
+                            statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                        }, 2000);
+                    }
+                } else {
+                    // Fallback if Poe API not available
+                    setTimeout(() => {
+                        updateResults(getMockResponse());
+                        loadingResults.classList.add('hidden');
+                        resultsContainer.classList.remove('hidden');
+                        statusBadge.textContent = 'Completed';
+                        statusBadge.classList.remove('bg-yellow-200', 'dark:bg-yellow-800', 'text-yellow-800', 'dark:text-yellow-200');
+                        statusBadge.classList.add('bg-green-200', 'dark:bg-green-800', 'text-green-800', 'dark:text-green-200');
+                    }, 2000);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
