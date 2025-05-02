@@ -8,3 +8,5 @@ emoji_data/cropped_emojis
 emoji_data/classified_emojis
 emoji_data/bg-removed
 yolov5
+sscapturing_script
+training_emojy_script
