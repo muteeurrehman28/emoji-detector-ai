@@ -9,8 +9,8 @@ import json
 import random
 
 # 🏷 Set paths
-model_path = r"D:/University Work/Backup/emoji-detector-ai/models/mobilenetv2_finetuned.h5"  # Updated model path
-class_labels_path = r'D:/University Work/Backup/emoji-detector-ai/models/class_labels.json'  # Update this path if needed
+model_path = r"D:\University Work\Backup\emoji-detector-ai\models\category_classification_model\mobilenetv2_finetuned.h5"  # Updated model path
+class_labels_path = r'D:\University Work\Backup\emoji-detector-ai\models\category_classification_model\class_labels.json'  # Update this path if needed
 dataset_dir = r"D:\University Work\Backup\emoji-detector-ai\emoji_data\classified_emojis"  # Path to the classified_emojis directory
 
 # 📊 Load class labels
@@ -43,7 +43,7 @@ if len(image_paths) == 0:
     print("No images found. Please check the dataset path or format of images.")
 else:
     # 📌 Randomly select 100 images for prediction
-    num_images_to_predict = 1000  # Adjust as needed
+    num_images_to_predict = 100  # Adjust as needed
     if len(image_paths) < num_images_to_predict:
         num_images_to_predict = len(image_paths)
         print(f"Dataset has only {num_images_to_predict} images. Predicting on all available images.")
