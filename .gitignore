@@ -10,3 +10,5 @@ emoji_data/bg-removed
 yolov5
 sscapturing_script
 training_emojy_script
+emoji_data/cropped-bgremoved-classified-emojis
+emoji_data/augmented_classified_emojis.zip
