@@ -134,8 +134,8 @@ for line in lines:
             continue
 
 # Directory containing emoji images
-image_dir = r"D:\University Work\Backup\emoji-detector-ai\emoji_data\processed"
-output_dir = r"D:\University Work\Backup\emoji-detector-ai\emoji_data\green-bg-classified-emojis"
+image_dir = r"D:\University Work\Backup\emoji-detector-ai\emoji_data\cropped_emojis"
+output_dir = r"D:\University Work\Backup\emoji-detector-ai\emoji_data\cropped-bgremoved-classified-emojis"
 
 # Create output directory
 os.makedirs(output_dir, exist_ok=True)
