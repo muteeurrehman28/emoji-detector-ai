@@ -1,0 +1,33 @@
+# Core ML/Deep Learning
+torch==2.1.0
+torchvision==0.16.0
+torchaudio==2.1.0
+opencv-python==4.8.1.78
+numpy==1.24.4
+
+# Text Detection / OCR
+pytesseract==0.3.10
+easyocr==1.7.1
+
+# Image Processing & Annotation
+Pillow==10.1.0
+matplotlib==3.7.3
+labelImg==1.8.6
+imgaug==0.4.0
+
+# Web API
+Flask==2.3.3
+flask-cors==4.0.0
+
+# Model Export & Docker Compatibility
+gunicorn==21.2.0
+
+# JSON Handling & Utilities
+python-multipart==0.0.6
+requests==2.31.0
+
+# YOLO (if using Ultralytics)
+ultralytics==8.0.216
+
+# Jupyter (optional for experiments)
+notebook==7.0.6
