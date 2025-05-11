@@ -24,11 +24,7 @@
 
 ## 🖼️ Frontend UI Placeholder
 
-Use the following image path to display your custom UI screenshot from your local directory:
-
-```markdown
 ![Frontend UI](frontend/assets/ui-screenshot.png)
-```
 
 ---
 
