@@ -172,7 +172,7 @@ def train_and_evaluate(images_dir, ann_dir):
     test_loader  = DataLoader(test_ds,  batch_size=1, shuffle=False,
                               num_workers=2, collate_fn=collate_fn)
 
-    # model, optimizer, schedulers
+    # Set model and optimizer
     model = get_model(len(CLASS_NAMES)).to(DEVICE)
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.SGD(params, lr=LEARNING_RATE,
@@ -187,13 +187,26 @@ def train_and_evaluate(images_dir, ann_dir):
                              schedulers=[warmup_scheduler, step_scheduler],
                              milestones=[WARMUP_ITERS])
 
-    # training loop
-    for epoch in range(1, NUM_EPOCHS+1):
+    # 🔁 Load checkpoint if available
+    latest_ckpt_path = "/content/drive/MyDrive/emoji_dataset/models/model_epoch_20.pth"
+    if os.path.exists(latest_ckpt_path):
+        print("✅ Loading existing model from checkpoint...")
+        checkpoint = torch.load(latest_ckpt_path, map_location=DEVICE)
+        model.load_state_dict(checkpoint["model_state"])
+        optimizer.load_state_dict(checkpoint["optim_state"])
+        scheduler.load_state_dict(checkpoint["scheduler_state"])
+        start_epoch = checkpoint["epoch"] + 1
+    else:
+        print("🆕 No checkpoint found — training from scratch.")
+        start_epoch = 1
+
+    # 🚀 Training loop
+    for epoch in range(start_epoch, NUM_EPOCHS + 1):
         model.train()
         running_loss = 0.0
         for images, targets in train_loader:
             images = [img.to(DEVICE) for img in images]
-            targets = [{k:v.to(DEVICE) for k,v in t.items()} for t in targets]
+            targets = [{k: v.to(DEVICE) for k, v in t.items()} for t in targets]
 
             loss_dict = model(images, targets)
             loss = sum(loss for loss in loss_dict.values())
@@ -205,27 +218,28 @@ def train_and_evaluate(images_dir, ann_dir):
             scheduler.step()
 
         avg_loss = running_loss / len(train_loader)
-        print(f"Epoch {epoch}/{NUM_EPOCHS} → Loss: {avg_loss:.4f}")
+        print(f"📦 Epoch {epoch}/{NUM_EPOCHS} → Loss: {avg_loss:.4f}")
 
-        # checkpoint
-        chkpt = os.path.join(CHECKPOINT_DIR, f"model_epoch_{epoch}.pth")
+        # Save checkpoint to Drive
+        save_path = f"/content/drive/MyDrive/emoji_dataset/models/model_epoch_{epoch}.pth"
         torch.save({
             "epoch": epoch,
             "model_state": model.state_dict(),
             "optim_state": optimizer.state_dict(),
             "scheduler_state": scheduler.state_dict()
-        }, chkpt)
+        }, save_path)
 
-        # evaluate
+        # Simple Evaluation
         evaluate_simple(model, test_loader, DEVICE)
 
     print("\n🏁 Training complete.")
+
 
 # ─── Run ───────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     # replace these paths with your actual directories:
-    DATA1_IMGS = "/content/drive/MyDrive/emoji_dataset/screenshot_images_1-300"
-    DATA1_ANN  = "/content/drive/MyDrive/emoji_dataset/annotations_1data"
+    DATA1_IMGS = "/content/drive/MyDrive/emoji_dataset/1_screenshotimages"
+    DATA1_ANN  = "/content/drive/MyDrive/emoji_dataset/1_annotations_rebased"
 
     train_and_evaluate(DATA1_IMGS, DATA1_ANN)
