@@ -1,80 +1,85 @@
-# sscapturing.py
-
 import io
 import math
 import os
 import time
 from selenium import webdriver
-from selenium.webdriver.edge.service import Service
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from PIL import Image
 
 def capture_and_stitch(output_path, base_name):
-    # your new crop values
-    start_x, end_x = 675, 1215
+    # Fixed x-axis cropping coordinates (permanent values)
+    start_x = 497
+    end_x = 857
 
-    # point to your local msedgedriver.exe
-    EDGE_DRIVER_PATH = r"D:\edgedriver_win64\msedgedriver.exe"
-    service = Service(executable_path=EDGE_DRIVER_PATH)
-    driver  = webdriver.Edge(service=service)
-
-    # set window size and load the page with base_name
+    # Initialize Chrome driver and set an initial window size
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.set_window_size(1920, 1080)
-    driver.get(f"http://127.0.0.1:5000/?base_name={base_name}")
-    time.sleep(3)  # wait for JS to generate & save annotations
 
-    # measure full page
-    total_h     = driver.execute_script("return document.body.scrollHeight")
-    view_h      = driver.execute_script("return window.innerHeight")
-    num_screens = math.ceil(total_h / view_h)
+    # Open your target URL (include base_name query parameter)
+    url = f"http://127.0.0.1:5000/?base_name={base_name}"
+    driver.get(url)
+    time.sleep(3)  # Wait for page to load fully
 
-    # capture each viewport
-    shots = []
+    # Get total page height and viewport height
+    total_height = driver.execute_script("return document.body.scrollHeight")
+    viewport_height = driver.execute_script("return window.innerHeight")
+    print(f"Total page height: {total_height}px, Viewport height: {viewport_height}px")
+
+    # Calculate number of screenshots needed
+    num_screens = math.ceil(total_height / viewport_height)
+    print(f"Capturing {num_screens} screenshots for full-page view.")
+
+    # List to hold individual screenshots
+    screenshots = []
+
     for i in range(num_screens):
-        y = total_h - view_h if i == num_screens - 1 else i * view_h
-        driver.execute_script("window.scrollTo(0, arguments[0]);", y)
-        time.sleep(1)
+        if i == num_screens - 1:
+            scroll_y = total_height - viewport_height
+        else:
+            scroll_y = i * viewport_height
+        driver.execute_script("window.scrollTo(0, arguments[0]);", scroll_y)
+        time.sleep(1)  # Allow time for scroll
         png = driver.get_screenshot_as_png()
-        shots.append(Image.open(io.BytesIO(png)))
+        img = Image.open(io.BytesIO(png))
+        screenshots.append(img)
 
     driver.quit()
 
-    if len(shots) < 2:
-        print("Need at least 2 screenshots to stitch.")
+    if len(screenshots) < 2:
+        print("Not enough screenshots captured to perform custom stitching.")
         return
 
-    # crop first shot (from y=30 down)
-    top_crop = shots[0].crop((start_x, 30, end_x, shots[0].height))
+    # Crop first screenshot (all vertical content starting from 20px from top)
+    first_img = screenshots[0]
+    first_cropped = first_img.crop((start_x, 20, end_x, first_img.height))
 
-    # crop second shot bottom ~38.9%
-    h1 = shots[1].height - 30
-    y1 = int(h1 * 0.6210)
-    bot_crop = shots[1].crop((start_x, y1, end_x, h1))
+    # For the second screenshot, take only the bottom 20% of it
+    second_img = screenshots[1]
+    second_height = second_img.height - 20
+    start_y_second_crop = int(second_height * 0.791)
+    second_cropped = second_img.crop((start_x, start_y_second_crop, end_x, second_height))
 
-    # stitch together
-    w = end_x - start_x
-    H = top_crop.height + bot_crop.height
-    out = Image.new("RGB", (w, H))
-    out.paste(top_crop, (0, 0))
-    out.paste(bot_crop, (0, top_crop.height))
+    final_width = end_x - start_x
+    final_height = first_cropped.height + second_cropped.height
+    final_img = Image.new('RGB', (final_width, final_height))
+    final_img.paste(first_cropped, (0, 0))
+    final_img.paste(second_cropped, (0, first_cropped.height))
 
-    # save to output_path/<base_name>.png
-    os.makedirs(output_path, exist_ok=True)
-    out_file = os.path.join(output_path, f"{base_name}.png")
-    out.save(out_file)
-    print("Saved image:", out_file)
-
+    output_filename = os.path.join(output_path, f"{base_name}.png")
+    final_img.save(output_filename)
+    print(f"Custom stitched image saved as '{output_filename}'")
 
 if __name__ == "__main__":
-    # 1) Ask for starting numeric suffix
-    start_num = int(input("Enter starting number (e.g. '90'): ").strip())
-    # 2) Ask how many captures
-    count     = int(input("How many captures? ").strip())
-    # 3) Ask for output directory
-    out_dir   = input("Screenshots folder: ").strip()
+    num_iterations = int(input("Enter how many times you want to run the screenshot capture: "))
+    output_dir = input("Enter the output directory for screenshots (e.g., 'screenshots'): ").strip()
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created output directory: {output_dir}")
 
-    for i in range(count):
-        current   = start_num + i
-        base_name = f"custom_stitched_{current}"
-        print(f"\nIteration {i+1}, saving as '{base_name}.png'")
-        capture_and_stitch(out_dir, base_name)
+    for i in range(1, num_iterations + 1):
+        # For each iteration, the base name is appended with the iteration number
+        base_name = f"custom_stitched_{i}"
+        print(f"\nStarting iteration {i} with base name '{base_name}'...")
+        capture_and_stitch(output_dir, base_name)
         time.sleep(2)
